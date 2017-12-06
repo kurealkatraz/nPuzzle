@@ -3,20 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   genMap.js                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nowl <nowl@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mgras <mgras@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/06 03:08:28 by nowl              #+#    #+#             */
-/*   Updated: 2017/12/06 03:41:05 by nowl             ###   ########.fr       */
+/*   Updated: 2017/12/06 12:49:54 by mgras            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 "use strict";
 
-var GenPuzzleMap = function(size, print)
-{
+var GenPuzzleMap = function(size, print) {
 	this.size				= size || 3;
 	this.print				= print || false;
 	this.mapString			= '#Generated ' + new Date().toDateString() + '\n' + this.size + '\n';
+	this.mapArray			= [];
 	var availableNumbers	= this.genAvailableNums(this.size);
 
 	for (var y = 0; y < this.size; y++)
@@ -27,30 +27,28 @@ var GenPuzzleMap = function(size, print)
 			var r = availableNumbers[index];
 
 			this.mapString += r;
+			this.mapArray.push(r);
 			if (x + 1 < this.size)
 				this.mapString += ' ';
 			availableNumbers.splice(index, 1);
 		}
-		this.mapString += '\n'
+		this.mapString += '\n';
 	}
 	if (print === true)
 		this.printOut();
 }
 
-GenPuzzleMap.prototype.printOut = function()
-{
+GenPuzzleMap.prototype.printOut = function() {
 	process.stdout.write(this.mapString);
 }
 
-GenPuzzleMap.prototype.randMinMax = function(min, max)
-{
+GenPuzzleMap.prototype.randMinMax = function(min, max) {
 	min = Math.ceil(min);
 	max = Math.floor(max);
 	return (Math.floor(Math.random() * (max - min)) + min)
 }
 
-GenPuzzleMap.prototype.genAvailableNums = function(size)
-{
+GenPuzzleMap.prototype.genAvailableNums = function(size) {
 	var arr = [];
 
 	size = (size * size) - 1;
