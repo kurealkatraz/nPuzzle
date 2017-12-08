@@ -6,9 +6,11 @@
 /*   By: mgras <mgras@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/07 16:34:15 by mgras             #+#    #+#             */
-/*   Updated: 2017/12/07 16:34:54 by mgras            ###   ########.fr       */
+/*   Updated: 2017/12/08 15:09:35 by mgras            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+"use strict";
 
 var MapGen	= require('./genMap.js');
 var argv	= process.argv.slice(2);

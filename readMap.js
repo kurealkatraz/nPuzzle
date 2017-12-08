@@ -6,27 +6,18 @@
 /*   By: mgras <mgras@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/06 03:36:52 by nowl              #+#    #+#             */
-/*   Updated: 2017/12/08 14:05:47 by mgras            ###   ########.fr       */
+/*   Updated: 2017/12/08 15:09:22 by mgras            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 "use strict";
 
-var MapNode	= require('./mapNode.js')
-var MapGen	= require('./genMap.js');
-var log		= require('./logs.js');
-var askArr	= require('./askMe.js');
-var fs		= require('fs');
-var argv	= process.argv.slice(2);
-var timeLog	= {};
-
-if (argv.length === 0)
-	main();
-else
-{
-	for (var i = 0; i < argv.length; i++)
-		main(argv[i]);
-}
+var log			= require('./logs.js');
+var askArr		= require('./askMe.js');
+var MapGen		= require('./genMap.js');
+var fs			= require('fs');
+var timeLog		= {};
+var logTime		= true;
 
 function askNumber(asked)
 {
@@ -164,12 +155,13 @@ function getArrayRow(size, rawMap, index)
 
 function getMapArrFromRaw(rawMap)
 {
-	var lookingForSize = true;
-	var sizeEndOfLine = false;
-	var retArr = [];
-	var c;
-	var size = 0;
+	var lookingForSize	= true;
+	var sizeEndOfLine	= false;
+	var retArr			= [];
+	var nbs				= [];
+	var size			= 0;
 	var retVals;
+	var c;
 
 	for (var i = 0; i < rawMap.length; i++)
 	{
@@ -214,6 +206,7 @@ function getMapArrFromRaw(rawMap)
 				if (!row)
 					return (failParsing(rawMap, i));
 				retArr.push(row.rowArray);
+				nbs = nbs.concat(row.rowArray);
 				i = row.index;
 			}
 		}
@@ -239,20 +232,19 @@ function getMapArrFromRaw(rawMap)
 		return (null);
 	}
 	else
-		return (retArr);
+	{
+		if (verifMapNodeValues(nbs, retArr.length) === false)
+			return (null);
+		else
+			return (retArr);
+	}
 }
 
-function verifMapNodeValues(mapArr, size)
+function verifMapNodeValues(nbs, size)
 {
-	var nbs = [];
 	var seen = [];
 
-	for (var y = 0; y < mapArr.length; y++)
-	{
-		for (var x = 0; x < mapArr[y].length; x++)
-			nbs.push(mapArr[y][x]);
-	}
-	for (var z = 0; z < (size * size) - 1; z++)
+	for (var z = 0; z < nbs.length; z++)
 	{
 		if (nbs[z] === undefined)
 		{
@@ -281,13 +273,14 @@ function processMap(rawMap, mapObj)
 {
 	var size;
 	var mapArr;
-	var mapTree;
 
 	if (mapObj)
 	{
 		size = mapObj.size;
 		mapArr = mapObj.mapArr;
-		logTimeStats();
+		if (logTime)
+			logTimeStats();
+		return ({size : size, mapArr : mapArr});
 	}
 	else
 	{
@@ -297,10 +290,10 @@ function processMap(rawMap, mapObj)
 		if (mapArr === null)
 			return (0);
 		size = mapArr.length;
-		timeLog.mapVerif = {start : new Date().getTime()};
-		if (verifMapNodeValues(mapArr, size) === false)
-			return (0);
-		timeLog.mapVerif.end = new Date().getTime();
-		logTimeStats();
+		if (logTime)
+			logTimeStats();
+		return ({size : size, mapArr : mapArr});
 	}
 }
+
+module.exports = main;
