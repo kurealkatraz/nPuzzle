@@ -6,7 +6,7 @@
 /*   By: mgras <mgras@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/06 12:15:37 by mgras             #+#    #+#             */
-/*   Updated: 2017/12/06 12:41:49 by mgras            ###   ########.fr       */
+/*   Updated: 2017/12/08 13:18:30 by mgras            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,5 +23,8 @@ module.exports = {
 	},
 	warn : function(str) {
 		console.log(chalk.black(chalk.bgYellow('[WARN] : ' + str)));
+	},
+	info : function(str) {
+		console.log(chalk.bgBlue(chalk.white('[INFO] : ' + str)));
 	}
 }
