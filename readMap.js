@@ -6,12 +6,13 @@
 /*   By: mgras <mgras@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/06 03:36:52 by nowl              #+#    #+#             */
-/*   Updated: 2017/12/08 15:09:22 by mgras            ###   ########.fr       */
+/*   Updated: 2017/12/12 12:07:20 by mgras            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 "use strict";
 
+var nUtils		= require('./nUtils.js');
 var log			= require('./logs.js');
 var askArr		= require('./askMe.js');
 var MapGen		= require('./genMap.js');
@@ -19,7 +20,7 @@ var fs			= require('fs');
 var timeLog		= {};
 var logTime		= true;
 
-function askNumber(asked)
+function askNumber(asked, cb)
 {
 	var mapObj;
 	var input;
@@ -33,14 +34,14 @@ function askNumber(asked)
 			timeLog.mapGen = {start : new Date().getTime()};
 			mapObj = new MapGen(input, false);
 			timeLog.mapGen.end = new Date().getTime();
-			processMap(null, mapObj);
+			processMap(null, mapObj, cb);
 		}
 		else
-			askAgain(asked);
+			askAgain(asked, cb);
 	});
 }
 
-function askAgain(asked)
+function askAgain(asked, cb)
 {
 	if (asked >= askArr.length)
 		asked = askArr.length - 1;
@@ -50,15 +51,15 @@ function askAgain(asked)
 		log.warn('You are displaying a really unacceptable behavior human, goodye');
 		process.exit();
 	}
-	askNumber(asked + 1);
+	askNumber(asked + 1, cb);
 }
 
-function main(mapPath)
+function main(mapPath, cb)
 {
 	if (!mapPath)
 	{
 		log.succ('No map provided, generating our own, please provide a size :');
-		askNumber(0);
+		askNumber(0, cb);
 	}
 	else
 	{
@@ -70,7 +71,7 @@ function main(mapPath)
 			}
 			else
 			{
-				processMap(content.toString('utf8').trim());
+				processMap(content.toString('utf8').trim(), null, cb);
 			}
 		});
 	}
@@ -262,25 +263,55 @@ function verifMapNodeValues(nbs, size)
 	return (true);
 }
 
-function logTimeStats(logObj) {
-	if (!logObj)
-		logObj = timeLog;
-	for (var logData in logObj)
-		log.info(logData + ' ' + (logObj[logData].end - logObj[logData].start) + 'ms');
+function checkIfSolution(mapArr)
+{
+	var dNb			= 0;
+	var expected	= nUtils.getExpectedBoard(mapArr.length);
+	var workingMap	= mapArr.map((arr) => {
+		return (arr.slice(0));
+	});
+
+	while (nUtils.cmpBoards(expected, workingMap) !== 0)
+	{
+		var expPos	= nUtils.firstOccOfMissplacement(expected, workingMap);
+		var missPos	= nUtils.findExpectedPosition(expPos, expected, workingMap);
+		var swp;
+
+		if (missPos === null)
+			return (dNb);
+		swp = workingMap[missPos.y][missPos.x];
+		workingMap[missPos.y][missPos.x] = workingMap[expPos.y][expPos.x]
+		workingMap[expPos.y][expPos.x] = swp;
+		dNb++;
+	}
+	return (dNb);
 }
 
-function processMap(rawMap, mapObj)
+function processMap(rawMap, mapObj, cb)
 {
 	var size;
 	var mapArr;
+	var solveNb;
 
 	if (mapObj)
 	{
 		size = mapObj.size;
 		mapArr = mapObj.mapArr;
-		if (logTime)
-			logTimeStats();
-		return ({size : size, mapArr : mapArr});
+		solveNb = nUtils.isOdd(checkIfSolution(mapArr));
+		if (solveNb !== 0)
+		{
+			log.err('Puzzle is unsolvable :(, generating anotherone the same size');
+			timeLog.mapGen = {start : new Date().getTime()};
+			mapObj = new MapGen(size, false);
+			timeLog.mapGen.end = new Date().getTime();
+			processMap(null, mapObj, cb);
+		}
+		else
+		{
+			if (logTime)
+				log.time(timeLog);
+			cb({size : size, mapArr : mapArr});
+		}
 	}
 	else
 	{
@@ -290,9 +321,17 @@ function processMap(rawMap, mapObj)
 		if (mapArr === null)
 			return (0);
 		size = mapArr.length;
+		solveNb = nUtils.isOdd(checkIfSolution(mapArr));
+		if (solveNb !== 0)
+		{
+			log.err('Puzzle is unsolvable :(')
+			return (0);
+		}
+		if (solveNb !== 0)
+			process.exit();
 		if (logTime)
-			logTimeStats();
-		return ({size : size, mapArr : mapArr});
+			log.time(timeLog);
+		cb({size : size, mapArr : mapArr});
 	}
 }
 
