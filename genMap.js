@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   genMap.js                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgras <mgras@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nowl <nowl@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/06 03:08:28 by nowl              #+#    #+#             */
-/*   Updated: 2017/12/11 14:42:38 by mgras            ###   ########.fr       */
+/*   Updated: 2017/12/24 16:39:25 by nowl             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,8 @@ GenPuzzleMap.prototype.printOut = function() {
 }
 
 GenPuzzleMap.prototype.randMinMax = function(min, max) {
-	min = Math.ceil(min);
-	max = Math.floor(max);
+	min = Math.floor(min);
+	max = Math.ceil(max);
 	return (Math.floor(Math.random() * (max - min)) + min)
 }
 
@@ -58,7 +58,7 @@ GenPuzzleMap.prototype.genAvailableNums = function(size) {
 		arr.push(size);
 		size--;
 	}
-	return (arr);
+	return (arr.reverse());
 }
 
 module.exports = GenPuzzleMap;

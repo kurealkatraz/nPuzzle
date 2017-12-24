@@ -6,7 +6,7 @@
 /*   By: nowl <nowl@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/08 15:02:57 by mgras             #+#    #+#             */
-/*   Updated: 2017/12/24 12:20:22 by nowl             ###   ########.fr       */
+/*   Updated: 2017/12/24 16:34:16 by nowl             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,6 +197,8 @@ function formulateAnswer(finishingNode, stats)
 		stepSolution.unshift(finishingNode.board);
 		finishingNode = finishingNode.parent;
 	}
+	if (finishingNode)
+		stepSolution.unshift(finishingNode.board);
 	for (var index = 0; index < stepSolution.length; index++)
 		log.printBoard(stepSolution[index]);
 	log.printStats(stats, endG);
