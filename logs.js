@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   logs.js                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgras <mgras@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nowl <nowl@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/06 12:15:37 by mgras             #+#    #+#             */
-/*   Updated: 2017/12/12 12:03:29 by mgras            ###   ########.fr       */
+/*   Updated: 2017/12/24 12:09:07 by nowl             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ module.exports = {
 
 		this.info('Solved in : ' + time + 'ms');
 		this.info('Total number of states ever selected in the "opened" set : ' + stats.nbOpenSelected);
-		this.info('Maximum number of states ever represented in memory at the same time during the search : ' + (stats.maxOpenState + stats.maxCloseState));
+		this.info('Maximum number of states ever represented in memory at the same time during the search : ' + (stats.maxExistingState));
 		this.info('Number of moves required to transition from the initial state to the final state according to the search : ' + nbMoves);
 	}
 }

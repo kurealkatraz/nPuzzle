@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   n-Puzzle.js                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgras <mgras@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nowl <nowl@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/08 15:02:57 by mgras             #+#    #+#             */
-/*   Updated: 2017/12/12 12:07:46 by mgras            ###   ########.fr       */
+/*   Updated: 2017/12/24 12:20:22 by nowl             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,15 @@ if (argv.length === 0)
 }
 else
 {
+	var j = 0;
+
 	for (var i = 0; i < argv.length; i++)
 	{
 		MapReader(argv[i], (mapObj) => {
 			solve(mapObj);
-			process.exit();
+			j++;
+			if (j >= argv.length)
+				process.exit();
 		});
 	}
 }
@@ -105,6 +109,8 @@ function updateStats(stats, openL, closeL)
 		stats.maxOpenState = openL;
 	if (closeL > stats.maxCloseState)
 		stats.maxCloseState = closeL;
+	if (openL + closeL > stats.maxExistingState)
+		stats.maxExistingState = openL + closeL;
 	return (stats);
 }
 
@@ -115,10 +121,11 @@ function solve(mapObj)
 	var open	= [{board : mapObj.mapArr, g : 0, h : heuristics(mapObj.mapArr, exBoard), childs : [], parent : null}];
 	var closed	= [];
 	var stats	= {
-		nbOpenSelected	: 0,
-		maxOpenState	: 0,
-		maxCloseState	: 0,
-		timeofSearch	: {
+		nbOpenSelected		: 0,
+		maxOpenState		: 0,
+		maxCloseState		: 0,
+		maxExistingState	: 0,
+		timeofSearch		: {
 			start	: new Date().getTime()
 		}
 	};
@@ -131,7 +138,7 @@ function solve(mapObj)
 		var moveList		= getMoveList(selectedNode.board, vPos);
 
 		stats = updateStats(stats, open.length, closed.length);
-		closed.push(selectedNode);
+		closed.unshift(selectedNode);
 		open.shift();
 		for (var i = 0; i < moveList.length; i++)
 		{

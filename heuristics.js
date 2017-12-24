@@ -3,17 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   heuristics.js                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgras <mgras@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nowl <nowl@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/11 11:12:56 by mgras             #+#    #+#             */
-/*   Updated: 2017/12/11 18:14:40 by mgras            ###   ########.fr       */
+/*   Updated: 2017/12/24 15:03:48 by nowl             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 "use strict";
 
-module.exports = function manhattan(board, expected) {
+var nUtils = require('./nUtils.js');
+
+module.exports = (board, expected) => {
 	var total = 0;
+	var xMiss = 0;
+	var yMiss = 0;
 
 	for (var y = 0; y < board.length; y++)
 	{
@@ -22,10 +26,16 @@ module.exports = function manhattan(board, expected) {
 			var expPos		= findIndexInExpected(board[y][x], expected);
 			var mDistance	= Math.abs(expPos.x - x) + Math.abs(expPos.y - y);
 
-			total += mDistance;
+			if (expPos.x !== x)
+				xMiss++;
+			if (expPos.y !== y)
+				yMiss++;		
+			total += mDistance;				//Manhattan
 		}
 	}
-	total += cmpBoards(board, expected);
+	total += cmpBoards(board, expected);	//nValid
+	total += nMaxSwap(board, expected);		//nMaxSwap
+	total += (xMiss + yMiss);				//Tiles out of row and column
 	return (total);
 }
 
@@ -54,4 +64,27 @@ function findIndexInExpected(value, expected)
 				return ({x : x, y : y});
 		}
 	}
+}
+
+function nMaxSwap(mapArr, expected)
+{
+	var dNb			= 0;
+	var workingMap	= mapArr.map((arr) => {
+		return (arr.slice(0));
+	});
+
+	while (nUtils.cmpBoards(expected, workingMap) !== 0)
+	{
+		var expPos	= nUtils.firstOccOfMissplacement(expected, workingMap);
+		var missPos	= nUtils.findExpectedPosition(expPos, expected, workingMap);
+		var swp;
+
+		if (missPos === null)
+			return (dNb);
+		swp = workingMap[missPos.y][missPos.x];
+		workingMap[missPos.y][missPos.x] = workingMap[expPos.y][expPos.x]
+		workingMap[expPos.y][expPos.x] = swp;
+		dNb++;
+	}
+	return (dNb);
 }
